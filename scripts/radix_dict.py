@@ -23,3 +23,4 @@ if __name__ == "__main__":
                                     trie.insert(form.text, file[0])
 
     trie.json_dump('dict/adv/radix.json')
+    trie.dump('dict/adv/radix.pkl')

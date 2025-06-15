@@ -1,23 +1,29 @@
 import json
+import pickle
+
+
+def common_part(str1, str2):
+    j = 1
+    m = min(len(str1), len(str2))
+    while j <= m and str1[-j] == str2[-j]:
+        j += 1
+    return j - 1
 
 
 class RadixTree:
     def __init__(self):
         self.root = {}
 
-    def insert(self, key, value):
+    def insert(self, word, value):
+        key = '$' + word
         node = self.root
         i = len(key) - 1
-        while i > 0:
+        while i >= 0:
             found_child = False
             for child_suffix, child_node in node.items():
                 if key[i] == child_suffix[-1]:
                     found_child = True
-                    j = 1
-                    m = min(len(child_suffix), i + 1)
-                    while j <= m and key[i - j + 1] == child_suffix[-j]:
-                        j += 1
-                    j -= 1
+                    j = common_part(key[:(i+1)], child_suffix)
                     if j == len(child_suffix):
                         node = child_node
                     else:
@@ -28,21 +34,25 @@ class RadixTree:
                     i -= j
                     break
             if not found_child:
-                new_suffix = '$' + key[:(i+1)]
+                new_suffix = key[:(i+1)]
                 node[new_suffix] = value
                 break
 
     def search(self, word):
         key = '$' + word
         node = self.root
-        i = len(key)
-        while i > 0:
+        i = len(key) - 1
+        while i >= 0:
             found_child = False
             for child_suffix, child_node in node.items():
-                if key[i - len(child_suffix):i] == child_suffix:
-                    node = child_node
-                    i -= len(child_suffix)
+                if key[i] == child_suffix[-1]:
                     found_child = True
+                    j = common_part(key[:(i+1)], child_suffix)
+                    if j == len(child_suffix):
+                        node = child_node
+                    else:
+                        return None
+                    i -= j
                     break
             if not found_child:
                 return None
@@ -56,17 +66,25 @@ class RadixTree:
         with open(filename, 'r', encoding="utf-8") as fp:
             self.root = json.load(fp)
 
+    def dump(self, filename):
+        with open(filename, 'wb') as fp:
+            pickle.dump(self.root, fp)
+
+    def load(self, filename):
+        with open(filename, 'rb') as fp:
+            self.root = pickle.load(fp)
+
 
 if __name__ == "__main__":
     trie = RadixTree()
-    trie.insert("astra", "n")
+    trie.insert("фіяле+тава-сі+ні", "n")
     print(trie.root)
-    trie.insert("fastra", "n")
+    trie.insert("барво+ва-сі+ні", "n")
     print(trie.root)
-    trie.insert("tra", "n")
+    trie.insert("ружо+ва-сі+ні", "n")
     print(trie.root)
-    trie.insert("sestra", "n")
+    trie.insert("васілько+ва-сі+ні", "n")
     print(trie.root)
-    trie.insert("sistra", "n")
+    trie.insert("сі+ні", "n")
     print(trie.root)
-    print(trie.search("astra"))
+    print(trie.search("сі+ні"))
