@@ -25,7 +25,11 @@ class RadixTree:
                     found_child = True
                     j = common_part(key[:(i+1)], child_suffix)
                     if j == len(child_suffix):
-                        node = child_node
+                        if j == i + 1:
+                            if value not in child_node:
+                                node[child_suffix] = child_node + value
+                        else:
+                            node = child_node
                     else:
                         new_node = {child_suffix[:-j]: child_node}
                         del node[child_suffix]
@@ -56,6 +60,38 @@ class RadixTree:
                     break
             if not found_child:
                 return None
+        return node
+
+    def search_node(self, word):
+        key = word
+        node = self.root
+        i = len(key) - 1 
+        while i >= 0:
+            found_child = False
+            for child_suffix, child_node in node.items():
+                if key[i] == child_suffix[-1]:
+                    print(key[i])
+                    found_child = True
+                    j = common_part(key[:(i+1)], child_suffix)
+                    node = child_node
+                    i -= j
+                    break
+            if not found_child:
+                return None
+        return node
+
+    def print_all(self, node, prefix):
+        if node is None:
+            return
+        for child_suffix, child_node in node.items():
+            if type(child_node) is str:
+                print(child_suffix[1:] + prefix + ': ' + child_node)
+            else:
+                self.print_all(child_node, child_suffix + prefix)
+
+    def ends_with(self, word):
+        node = self.search_node(word)
+        self.print_all(node, word)
         return node
 
     def json_dump(self, filename):

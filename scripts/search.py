@@ -7,4 +7,4 @@ if __name__ == "__main__":
     trie.load('dict/adv/radix.pkl')
     if len(sys.argv) > 1:
         word = sys.argv[1]
-    print(trie.search(word))
+    print(trie.ends_with(word))
