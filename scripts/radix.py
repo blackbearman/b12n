@@ -11,7 +11,8 @@ def common_part(str1, str2):
 
 
 class RadixTree:
-    def __init__(self):
+    def __init__(self, alphabet):
+        self.alphabet = alphabet
         self.root = {}
 
     def insert(self, word, value):
@@ -20,6 +21,8 @@ class RadixTree:
         i = len(key) - 1
         while i >= 0:
             found_child = False
+            if key[i] not in self.alphabet:
+                raise Exception(f"Symbol {key[i]} ({key}) is not in alphabet.")
             for child_suffix, child_node in node.items():
                 if key[i] == child_suffix[-1]:
                     found_child = True
@@ -112,7 +115,7 @@ class RadixTree:
 
 
 if __name__ == "__main__":
-    trie = RadixTree()
+    trie = RadixTree("абвгдеёжзійклмнопрстуўфхцчшыьэюя-+'$")
     trie.insert("фіяле+тава-сі+ні", "n")
     print(trie.root)
     trie.insert("барво+ва-сі+ні", "n")
